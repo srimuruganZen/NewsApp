@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, StyleSheet,Image, Dimensions,ToastAndroid, TouchableOpacity,TextInput} from 'react-native';
+import {Text, View, StyleSheet,Image, Dimensions, TouchableOpacity,TextInput} from 'react-native';
 import {getNews, getDetailedNews, searchByInput,clearNewsFeed} from './actions';
 import {connect} from 'react-redux';
 import GridView from 'react-native-super-grid';
@@ -13,7 +13,8 @@ class News extends Component {
     static navigationOptions = {
         title: 'Top News',
 		headerTitleStyle :{paddingLeft:width/3}
-    };
+	};
+
   componentDidMount(){
 	this.props.getNews(1);
   }
@@ -25,12 +26,6 @@ class News extends Component {
 	}else{
 		this.props.searchByInput({keyword:this.state.search_input,count:this.state.pageCount})
 	}
-  }
-
-  componentWillReceiveProps(nextProps){
-	  if(nextProps.loading){
-		ToastAndroid.show('Fetching News . . .', ToastAndroid.SHORT);
-	  }
   }
 
   getDetailedNews(item){
@@ -55,11 +50,23 @@ class News extends Component {
   render() {
     return (
 			<View style={{flex:1,backgroundColor:'#fff'}}>
-			<View style={{flexDirection:'row',padding:5,borderBottomColor:'#716f6f66',borderBottomWidth:1}}>
-				<TextInput ref={input => { this.textInput = input }} onChangeText={(search_input) => this.setState({search_input})} placeholder="Enter keyword . . ." style={{width:'60%',borderRadius:10,paddingLeft:5}}/>
-				<TouchableOpacity onPress={()=>{this.searchByInput()}} style={{width:'40%',backgroundColor:'#716f6f66',borderRadius:50,alignItems:'center',justifyContent:'center'}}><Text>{this.state.searchMode ? "Clear Search" : "Search"}</Text></TouchableOpacity>
-			</View>
-			
+			{
+				!this.props.loading ?
+				<View style={{flexDirection:'row',padding:5,borderBottomColor:'#716f6f66',borderBottomWidth:1,  shadowRadius: 1,
+				shadowOffset: {
+				  width: 0,
+				  height: 2,
+				},
+				shadowColor: '#000000',
+				elevation: 3}}>
+					<TextInput ref={input => { this.textInput = input }} value={this.state.search_input} onChangeText={(search_input) => this.setState({search_input})} placeholder="Enter keyword . . ." style={{width:'60%',borderRadius:10,paddingLeft:5}}/>
+					<TouchableOpacity onPress={()=>{this.searchByInput()}} style={{width:'40%',backgroundColor:this.state.searchMode ? '#716f6f66':'#fff',borderRadius:50,alignItems:'center',justifyContent:'center',borderColor:'#716f6f66',borderWidth:1}}><Text>{this.state.searchMode ? "Clear Search" : "Search"}</Text></TouchableOpacity>
+				</View>
+				:
+				<View style={{backgroundColor:'grey',flexDirection:'row',padding:10,borderBottomColor:'#716f6f66',borderBottomWidth:1,justifyContent:'center'}}>
+			 		<Text style={{color:'white',alignSelf:'center'}}>Fetching News . . .</Text>
+				</View>
+			}
 			{
 				this.props.news && this.props.news.length > 0 ? 
 				<GridView
@@ -71,7 +78,7 @@ class News extends Component {
 					renderItem={item => (
 					<TouchableOpacity onPress={()=>this.getDetailedNews(item)}>
 					<View style={[styles.itemContainer, { backgroundColor: 'skyblue' }]}>
-					<Image style={{width:'100%',height:'100%',position:'absolute',borderRadius:5,opacity:1}} source={{uri:item.urlToImage}}/>
+					<Image style={{width:'100%',height:'100%',position:'absolute',borderRadius:5,opacity:1}} source={{uri:item.urlToImage != '' ? item.urlToImage : baseImage }}/>
 						<Text numberOfLines={2} style={styles.itemName}>{item.title}</Text>
 						<View style={{flexDirection:'row', backgroundColor:'#000000a1',width:'100%',borderBottomLeftRadius:5,borderBottomRightRadius:5}}> 
 							<Text style={styles.itemCode}>{constructDate(item.publishedAt)}</Text>
@@ -87,7 +94,7 @@ class News extends Component {
     )
   }
 }
-
+const baseImage = "https://cdn.pixabay.com/photo/2015/02/15/09/33/news-636978_960_720.jpg";
 const mapStateToProps = (state) => ({
   news : state.news ? state.news : null,
   loading : state.loading

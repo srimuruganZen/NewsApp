@@ -18,8 +18,6 @@ function* fetchNews(count) {
 
 function* getSearchInputData(data) {
   try {
-    let datas = BASE_URL+"/everything?q="+data.keyword+"&page="+data.count
-    console.log(datas)
     const json = yield fetch(BASE_URL+"/everything?q="+data.data.keyword+"&page="+data.data.count,{
       headers: {
         "X-Api-Key": APIKEY

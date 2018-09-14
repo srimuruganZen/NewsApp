@@ -10,7 +10,7 @@ class DetailedNews extends Component {
     }
     static navigationOptions = {
         title: 'Detailed News',
-        headerTitleStyle :{paddingLeft:width/6}
+        headerTitleStyle :{paddingLeft:width/7}
     };
 
   render() {
@@ -18,7 +18,7 @@ class DetailedNews extends Component {
     return (
 			<View style={{flex:1,backgroundColor:'#fff'}}>
                 <View style={{flex:0.4}}>
-                    <Image source={{uri:news.urlToImage,width:'100%',height:'100%'}}/>
+                    <Image source={{uri:news.urlToImage != '' ? news.urlToImage : baseImage,width:'100%',height:height/3}}/>
                 </View>
                 <View style={{flex:0.5,padding:8}}>
                     <Text style={{fontSize:20,color:'#000'}}>{news.title}</Text>
@@ -29,7 +29,7 @@ class DetailedNews extends Component {
     )
   }
 }
-
+const baseImage = "https://cdn.pixabay.com/photo/2015/02/15/09/33/news-636978_960_720.jpg";
 const mapStateToProps = (state) => ({
   newsDetail : state.newsDetail ? state.newsDetail : null,
   loading : state.loading
