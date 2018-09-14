@@ -20,11 +20,12 @@ export function constructDate(date){
 export function constructTime(date){
     if(date){
         const initial = new Date(date);
-        let constructedDate = initial.toLocaleString();
+        let constructedDate = initial.toLocaleTimeString();
         if(constructedDate){
-            return constructedDate.split(',')[1].slice(0,6);
+            let time = constructedDate.slice(0,5);
+                return time;
+            }
         }else{
             return '';
         } 
-    }
 }
