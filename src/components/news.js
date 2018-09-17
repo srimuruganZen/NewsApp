@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Text, View, StyleSheet,Image, Dimensions, TouchableOpacity,TextInput} from 'react-native';
-import {getNews, getDetailedNews, searchByInput,clearNewsFeed} from '../actions/actions';
+import {getNews, getDetailedNews, searchByInput,clearNewsFeed,getSources,clearFilter} from '../actions/actions';
 import {connect} from 'react-redux';
 import GridView from 'react-native-super-grid';
 import {constructDate,constructTime,baseImage} from './helper';
@@ -10,43 +10,67 @@ class News extends Component {
 		super(props);
 		this.state = { pageCount : 1 ,search_input : "", searchMode: false }
 	}
-    static navigationOptions = {
+    static navigationOptions = ({ navigation }) => ({
         title: 'Top News',
-		headerTitleStyle :{paddingLeft:width/3}
-	};
-
+		headerTitleStyle :{paddingLeft:width/3},
+		headerRight: <TouchableOpacity onPress={()=>navigation.navigate('FilterNewS')}><Image style={{height:20,width:20,marginRight:15}} resizeMode='contain' source={require('../images/funn.png')}></Image></TouchableOpacity>
+	})
   componentDidMount(){
-	this.props.getNews(1);
+	this.props.getNews({count:this.state.pageCount});
+	this.props.getSources();
   }
 
   reachedEnd(){
-	this.setState({pageCount: this.state.pageCount +1});
-	if(this.state.search_input == ''){
-		this.props.getNews(this.state.pageCount);
-	}else{
-		this.props.searchByInput({keyword:this.state.search_input,count:this.state.pageCount})
+	if(this.props.news.length > 19 && !this.props.loading){
+		let count = this.state.pageCount +1
+		this.setState({pageCount: count});
+		if(this.props.filterName){
+			this.searchFilter();
+		}else{
+			if(this.state.search_input == ''){
+				this.props.getNews({count:count});
+			}else{
+				this.props.searchByInput({keyword:this.state.search_input,count:count})
+			}
+		}
 	}
   }
-
+  onRemoveFilter(){
+	this.props.clearFilter();
+	this.props.clearNewsFeed();
+	this.props.getNews({count:1});
+  }
   getDetailedNews(item){
 	this.props.getDetailedNews(item);
 	this.props.navigation.navigate('DetailedNews');
   }
 
+  searchFilter(){
+	let datas ={
+		type:'filter',
+		news_id: this.props.filterName.id,
+		news_name: this.props.filterName
+	}
+	this.props.searchByInput({keyword:this.state.search_input,count:this.state.pageCount,datas})
+  }
+
   searchByInput(){
 	  if(this.state.search_input != '' && !this.state.searchMode){
 		this.props.clearNewsFeed();
-		this.setState({pageCount:1, searchMode:true})
-		this.props.searchByInput({keyword:this.state.search_input,count:1})
+		this.setState({pageCount:1, searchMode:true});
+		  if(this.props.filterName){
+			this.searchFilter();
+		  }else{
+			this.props.searchByInput({keyword:this.state.search_input,count:1})
+		  }
 		}
 		if(this.state.searchMode){
 			this.props.clearNewsFeed();
-			this.props.getNews(1);
+			this.props.getNews({count:1});
 			this.setState({search_input:"",searchMode:false});
 			this.textInput.clear();
 		}
   }
-
   render() {
     return (
 			<View style={{flex:1,backgroundColor:'#fff'}}>
@@ -71,13 +95,26 @@ class News extends Component {
 			 		<Text style={{color:'white',alignSelf:'center'}}>Fetching News . . .</Text>
 				</View>
 			}
-			{
+			{	
+				
 				this.props.news && this.props.news.length > 0 ? 
-				<GridView
+				<View style={{flex:1}}>
+				{
+					this.props.filterName ?
+					<View style={styles.filterView}>
+						<Text numberOfLines={2} style={{paddingRight:20,width:'80%'}}>{this.props.filterName.name}</Text>
+						<TouchableOpacity onPress={()=>this.onRemoveFilter()} style={styles.remove}>
+							<Text>X</Text>
+						</TouchableOpacity>
+					</View>
+					:
+					null
+				}
+					<GridView
 					itemDimension={130}
 					items={this.props.news}
 					style={styles.gridView}
-					onEndReachedThreshold={0.1}
+					onEndReachedThreshold={0.01}
 					onEndReached={()=>this.reachedEnd()}
 					renderItem={item => (
 					<TouchableOpacity onPress={()=>this.getDetailedNews(item)}>
@@ -92,6 +129,7 @@ class News extends Component {
 					</TouchableOpacity>
 					)}
 				/>
+				</View>
 				: <Text style={{alignSelf:'center',paddingTop:100}}>No results Found</Text>
 			}
 			</View>
@@ -172,19 +210,47 @@ const styles = StyleSheet.create({
 		justifyContent:'center',
 		borderColor:'#716f6f66',
 		borderWidth:1
+	},
+	filterView:{
+		margin:5,
+		borderColor:'grey',
+		borderWidth:1,
+		borderRadius:25,
+		alignSelf:'center',
+		paddingLeft:20,
+		paddingRight:0,
+		flexDirection:'row',
+		width:'60%',
+		height:40,
+		alignItems:'center'
+	},
+	remove:{
+		position:'absolute',
+		right:0,
+		borderWidth:1,
+		backgroundColor:'grey',
+		borderRadius:50,
+		height:'100%',
+		width:40,
+		alignItems:'center',
+		justifyContent:'center'
 	}
 })
 
 const mapStateToProps = (state) => ({
   news : state.news ? state.news : null,
+  filterName : state.filterName ? state.filterName : null,
   loading : state.loading
 })
 
 const mapDispatchToProps = (dispatch) =>({
-  getNews: (count) => dispatch(getNews(count)),
+  getNews: (data) => dispatch(getNews(data)),
+
   getDetailedNews: (data) => dispatch(getDetailedNews(data)),
   searchByInput: (data) => dispatch(searchByInput(data)),
-  clearNewsFeed: () => dispatch(clearNewsFeed())
+  clearNewsFeed: () => dispatch(clearNewsFeed()),
+  getSources: () => dispatch(getSources()),
+  clearFilter: () => dispatch(clearFilter())
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(News)

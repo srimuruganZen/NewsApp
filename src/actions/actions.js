@@ -24,3 +24,16 @@ export function clearNewsFeed(data) {
     type: 'NEWS_CLEAR'
   }
 }
+
+export function getSources(data) {
+  return {
+    type: 'GET_SOURCES',
+    data
+  }
+}
+
+export function clearFilter(){
+  return {
+    type: 'CLEAR_FILTER'
+  }
+}

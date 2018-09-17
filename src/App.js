@@ -4,9 +4,11 @@ import News from './components/news';
 import store from './store/store';
 import {Provider} from 'react-redux';
 import DetailedNews from './components/detailedNews';
+import FilterNewS from './components/filternews';
 const AppNavigator = createStackNavigator({
   News: { screen: News },
-  DetailedNews: { screen: DetailedNews }
+  DetailedNews: { screen: DetailedNews },
+  FilterNewS: { screen: FilterNewS}
 }
  ,{ 
   headerMode: 'screen'

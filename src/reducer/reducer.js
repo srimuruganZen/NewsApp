@@ -1,6 +1,7 @@
 const reducer = (state = {
     news:[],
-    loading:false
+    loading:false,
+    filterName: null
 }, action) => {
     switch (action.type) {
         case 'GET_DETAILED_NEWS':
@@ -10,29 +11,37 @@ const reducer = (state = {
                 ...state,
                 loading: true 
             };
-            break;
         case 'SEARCH_BY_INPUT_SUCESS':
         case 'NEWS_RECEIVED':
            return { 
                 ...state,
                 news: state.news.length == 0 ? action.json : state.news.concat(action.json),
-                loading: false 
+                loading: false,
+                filterName : action.filterName ? action.filterName : null  
             }
-            break;
         case 'DETAILED_NEWS_RECEIVED':
         return { 
              ...state,
              newsDetail: action.payload.data,
              loading: false 
          }
-         break;
          case 'NEWS_CLEARED':
          return { 
               ...state,
               news: [],
-              loading: false 
+              loading: false,
           }
-          break;
+          case 'GET_SOURCES_SUCCESS':
+          return{
+                ...state,
+                filters: action.json,
+                loading: false 
+          }
+          case 'CLEAR_FILTER_SUCCESS':
+          return{
+                ...state,
+                filterName: null,
+          }
       default: 
            return state;
     }
