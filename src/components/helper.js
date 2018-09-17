@@ -2,6 +2,8 @@ export const BASE_URL = 'https://newsapi.org/v2'
 
 export const APIKEY = '65c07391db9d4a689e195f83dc1144bd';
 
+export const baseImage = "https://cdn.pixabay.com/photo/2015/02/15/09/33/news-636978_960_720.jpg";
+
 export function constructDate(date){
     if(date){
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",

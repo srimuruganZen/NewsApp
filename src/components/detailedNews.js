@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Text, View, StyleSheet,Image, Dimensions,ToastAndroid} from 'react-native';
 import {connect} from 'react-redux';
-import {constructDate,constructTime} from './helper';
+import {constructDate,constructTime,baseImage} from './helper';
 const {height, width} = Dimensions.get('window');
 class DetailedNews extends Component {
 	constructor(props){
@@ -29,7 +29,7 @@ class DetailedNews extends Component {
     )
   }
 }
-const baseImage = "https://cdn.pixabay.com/photo/2015/02/15/09/33/news-636978_960_720.jpg";
+
 const mapStateToProps = (state) => ({
   newsDetail : state.newsDetail ? state.newsDetail : null,
   loading : state.loading

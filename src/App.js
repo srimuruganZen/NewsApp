@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import { createStackNavigator } from 'react-navigation';
-import News from './src/news';
-import store from './src/store';
+import News from './components/news';
+import store from './store/store';
 import {Provider} from 'react-redux';
-import DetailedNews from './src/detailedNews';
+import DetailedNews from './components/detailedNews';
 const AppNavigator = createStackNavigator({
   News: { screen: News },
   DetailedNews: { screen: DetailedNews }

@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {Text, View, StyleSheet,Image, Dimensions, TouchableOpacity,TextInput} from 'react-native';
-import {getNews, getDetailedNews, searchByInput,clearNewsFeed} from './actions';
+import {getNews, getDetailedNews, searchByInput,clearNewsFeed} from '../actions/actions';
 import {connect} from 'react-redux';
 import GridView from 'react-native-super-grid';
-import {constructDate,constructTime} from './helper';
+import {constructDate,constructTime,baseImage} from './helper';
 const {height, width} = Dimensions.get('window');
 class News extends Component {
 	constructor(props){
@@ -52,18 +52,22 @@ class News extends Component {
 			<View style={{flex:1,backgroundColor:'#fff'}}>
 			{
 				!this.props.loading ?
-				<View style={{flexDirection:'row',padding:5,borderBottomColor:'#716f6f66',borderBottomWidth:1,  shadowRadius: 1,
-				shadowOffset: {
-				  width: 0,
-				  height: 2,
-				},
-				shadowColor: '#000000',
-				elevation: 3}}>
-					<TextInput ref={input => { this.textInput = input }} value={this.state.search_input} onChangeText={(search_input) => this.setState({search_input})} placeholder="Enter keyword . . ." style={{width:'60%',borderRadius:10,paddingLeft:5}}/>
-					<TouchableOpacity onPress={()=>{this.searchByInput()}} style={{width:'40%',backgroundColor:this.state.searchMode ? '#716f6f66':'#fff',borderRadius:50,alignItems:'center',justifyContent:'center',borderColor:'#716f6f66',borderWidth:1}}><Text>{this.state.searchMode ? "Clear Search" : "Search"}</Text></TouchableOpacity>
+				<View style={styles.searchBox}>
+					<TextInput 
+						ref={input => { this.textInput = input }} 
+						value={this.state.search_input} 
+						onChangeText={(search_input) => this.setState({search_input})} 
+						placeholder="Enter keyword . . ." 
+						style={{width:'60%',borderRadius:10,paddingLeft:5}}
+					/>
+					<TouchableOpacity 
+						onPress={()=>{this.searchByInput()}} 
+						style={[styles.searchBoxButton,{backgroundColor:this.state.searchMode ? '#716f6f66':'#fff'}]}>
+						<Text>{this.state.searchMode ? "Clear Search" : "Search"}</Text>
+					</TouchableOpacity>
 				</View>
 				:
-				<View style={{backgroundColor:'grey',flexDirection:'row',padding:10,borderBottomColor:'#716f6f66',borderBottomWidth:1,justifyContent:'center'}}>
+				<View style={styles.loading}>
 			 		<Text style={{color:'white',alignSelf:'center'}}>Fetching News . . .</Text>
 				</View>
 			}
@@ -77,12 +81,12 @@ class News extends Component {
 					onEndReached={()=>this.reachedEnd()}
 					renderItem={item => (
 					<TouchableOpacity onPress={()=>this.getDetailedNews(item)}>
-					<View style={[styles.itemContainer, { backgroundColor: 'skyblue' }]}>
-					<Image style={{width:'100%',height:'100%',position:'absolute',borderRadius:5,opacity:1}} source={{uri:item.urlToImage != '' ? item.urlToImage : baseImage }}/>
+					<View style={styles.itemContainer}>
+					<Image style={styles.image} source={{uri:item.urlToImage != '' ? item.urlToImage : baseImage }}/>
 						<Text numberOfLines={2} style={styles.itemName}>{item.title}</Text>
-						<View style={{flexDirection:'row', backgroundColor:'#000000a1',width:'100%',borderBottomLeftRadius:5,borderBottomRightRadius:5}}> 
+						<View style={styles.timeInfo}> 
 							<Text style={styles.itemCode}>{constructDate(item.publishedAt)}</Text>
-							<Text style={{position:'absolute',right:5,color:'white',fontSize: 10}}>{constructTime(item.publishedAt)}</Text>
+							<Text style={styles.time}>{constructTime(item.publishedAt)}</Text>
 						</View>
 					</View>
 					</TouchableOpacity>
@@ -94,7 +98,83 @@ class News extends Component {
     )
   }
 }
-const baseImage = "https://cdn.pixabay.com/photo/2015/02/15/09/33/news-636978_960_720.jpg";
+
+const styles = StyleSheet.create({
+	searchBox: {
+		flexDirection:'row',
+		padding:5,
+		borderBottomColor:'#716f6f66',
+		borderBottomWidth:1,  
+		shadowRadius: 1,
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowColor: '#000000',
+		elevation: 3
+	},
+	loading: {
+		backgroundColor:'grey',
+		flexDirection:'row',
+		padding:10,
+		borderBottomColor:'#716f6f66',
+		borderBottomWidth:1,
+		justifyContent:'center'
+	},
+	gridView: {
+		flex: 1,
+	},
+	itemContainer: {
+		justifyContent: 'flex-end',
+		borderRadius: 5,
+		height: 150,
+		backgroundColor: 'skyblue'
+	},
+	itemName: {
+		fontSize: 12,
+		color: '#fff',
+		fontWeight: '600',
+		paddingLeft:5,
+		backgroundColor:'#000000a1'
+	},
+	itemCode: {
+		fontWeight: '600',
+		fontSize: 10,
+		color: '#fff',
+		paddingLeft:5,
+		textAlign:'left',
+		width:'50%'
+	},
+	image:{
+		width:'100%',
+		height:'100%',
+		position:'absolute',
+		borderRadius:5,
+		opacity:1
+	},
+	timeInfo:{
+		flexDirection:'row',
+		backgroundColor:'#000000a1',
+		width:'100%',
+		borderBottomLeftRadius:5,
+		borderBottomRightRadius:5
+	},
+	time:{
+		position:'absolute',
+		right:5,
+		color:'white',
+		fontSize: 10
+	},
+	searchBoxButton:{
+		width:'40%',
+		borderRadius:50,
+		alignItems:'center',
+		justifyContent:'center',
+		borderColor:'#716f6f66',
+		borderWidth:1
+	}
+})
+
 const mapStateToProps = (state) => ({
   news : state.news ? state.news : null,
   loading : state.loading
@@ -106,33 +186,5 @@ const mapDispatchToProps = (dispatch) =>({
   searchByInput: (data) => dispatch(searchByInput(data)),
   clearNewsFeed: () => dispatch(clearNewsFeed())
 })
-
-const styles = StyleSheet.create({
-	gridView: {
-	//   paddingTop: 25,
-	  flex: 1,
-	},
-	itemContainer: {
-	  justifyContent: 'flex-end',
-	  borderRadius: 5,
-	//   padding: 10,
-	  height: 150,
-	},
-	itemName: {
-	  fontSize: 12,
-	  color: '#fff',
-	  fontWeight: '600',
-	  paddingLeft:5,
-	  backgroundColor:'#000000a1'
-	},
-	itemCode: {
-	  fontWeight: '600',
-	  fontSize: 10,
-	  color: '#fff',
-	  paddingLeft:5,
-	  textAlign:'left',
-	  width:'50%'
-	}
-  });
 
 export default connect(mapStateToProps,mapDispatchToProps)(News)
