@@ -13,7 +13,10 @@ class News extends Component {
     static navigationOptions = ({ navigation }) => ({
         title: 'Top News',
 		headerTitleStyle :{paddingLeft:width/3},
-		headerRight: <TouchableOpacity onPress={()=>navigation.navigate('FilterNewS')}><Image style={{height:20,width:20,marginRight:15}} resizeMode='contain' source={require('../images/funn.png')}></Image></TouchableOpacity>
+		headerRight: <TouchableOpacity onPress={()=>navigation.navigate('FilterNewS')}>
+						<Image style={styles.headerTop} resizeMode='contain' source={require('../images/funn.png')}>
+						</Image>
+					</TouchableOpacity>
 	})
   componentDidMount(){
 	this.props.getNews({count:this.state.pageCount});
@@ -73,7 +76,7 @@ class News extends Component {
   }
   render() {
     return (
-			<View style={{flex:1,backgroundColor:'#fff'}}>
+			<View style={styles.baseView}>
 			{
 				!this.props.loading ?
 				<View style={styles.searchBox}>
@@ -82,7 +85,7 @@ class News extends Component {
 						value={this.state.search_input} 
 						onChangeText={(search_input) => this.setState({search_input})} 
 						placeholder="Enter keyword . . ." 
-						style={{width:'60%',borderRadius:10,paddingLeft:5}}
+						style={styles.searchInput}
 					/>
 					<TouchableOpacity 
 						onPress={()=>{this.searchByInput()}} 
@@ -92,7 +95,7 @@ class News extends Component {
 				</View>
 				:
 				<View style={styles.loading}>
-			 		<Text style={{color:'white',alignSelf:'center'}}>Fetching News . . .</Text>
+			 		<Text style={styles.fetching}>Fetching News . . .</Text>
 				</View>
 			}
 			{	
@@ -102,7 +105,7 @@ class News extends Component {
 				{
 					this.props.filterName ?
 					<View style={styles.filterView}>
-						<Text numberOfLines={2} style={{paddingRight:20,width:'80%'}}>{this.props.filterName.name}</Text>
+						<Text numberOfLines={2} style={styles.filter}>{this.props.filterName.name}</Text>
 						<TouchableOpacity onPress={()=>this.onRemoveFilter()} style={styles.remove}>
 							<Text>X</Text>
 						</TouchableOpacity>
@@ -130,7 +133,7 @@ class News extends Component {
 					)}
 				/>
 				</View>
-				: <Text style={{alignSelf:'center',paddingTop:100}}>No results Found</Text>
+				: <Text style={styles.noResult}>No results Found</Text>
 			}
 			</View>
     )
@@ -138,6 +141,15 @@ class News extends Component {
 }
 
 const styles = StyleSheet.create({
+	searchInput:{
+		width:'60%',
+		borderRadius:10,
+		paddingLeft:5
+	},
+	fetching:{
+		color:'white',
+		alignSelf:'center'
+	},
 	searchBox: {
 		flexDirection:'row',
 		padding:5,
@@ -151,6 +163,10 @@ const styles = StyleSheet.create({
 		shadowColor: '#000000',
 		elevation: 3
 	},
+	baseView:{
+		flex:1,
+		backgroundColor:'#fff'
+	},
 	loading: {
 		backgroundColor:'grey',
 		flexDirection:'row',
@@ -161,6 +177,10 @@ const styles = StyleSheet.create({
 	},
 	gridView: {
 		flex: 1,
+	},
+	filter:{
+		paddingRight:20,
+		width:'80%'
 	},
 	itemContainer: {
 		justifyContent: 'flex-end',
@@ -234,6 +254,15 @@ const styles = StyleSheet.create({
 		width:40,
 		alignItems:'center',
 		justifyContent:'center'
+	},
+	noResult:{
+		alignSelf:'center',
+		paddingTop:100
+	},
+	headerTop:{
+		height:20,
+		width:20,
+		marginRight:15
 	}
 })
 

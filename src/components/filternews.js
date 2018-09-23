@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Text, View, StyleSheet,TouchableOpacity, Dimensions,FlatList} from 'react-native';
 import {connect} from 'react-redux';
 import {getNews, clearNewsFeed} from '../actions/actions';
-const {height, width} = Dimensions.get('window');
 class FilterNewS extends Component {
 	constructor(props){
 		super(props);
@@ -32,8 +31,8 @@ class FilterNewS extends Component {
                     renderItem={({item})=>
                     <TouchableOpacity key={item.name} style={styles.filterBox} onPress={this.getNewsByFilter.bind(this,item)}>
                         <View>
-                            <Text key={item.id} style={{color:'#000'}}>{item.name}</Text>
-                            <Text style={{fontSize:12}}>{item.category}</Text>
+                            <Text key={item.id} style={styles.white}>{item.name}</Text>
+                            <Text style={styles.font}>{item.category}</Text>
                         </View>
                     </TouchableOpacity>
                     }
@@ -61,6 +60,12 @@ const styles = StyleSheet.create({
 		},
 		shadowColor: '#000000',
 		elevation: 3
+    },
+    white:{
+        color:'#000'
+    },
+    font:{
+        fontSize:12
     }
 })
 
